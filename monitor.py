@@ -173,4 +173,4 @@ if __name__ == '__main__':
         nowtime = time.strftime(timeformat, time.localtime())
         run = check_eos()
         run.get_info()
-        time.sleep(5)
+        time.sleep(6)
