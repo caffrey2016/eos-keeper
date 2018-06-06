@@ -8,7 +8,7 @@ import time
 import os
 
 nodename = "eosstore1111"
-address = '54.168.92.89'
+address = '127.0.0.1'
 
 filepath1 = '/tmp/.status'
 filepath2 = '/tmp/.n'
@@ -39,8 +39,8 @@ class send_message(object):
         pass
 
     def access_server(self):
-        CorpID = "XXXXXXXX"
-        Secret = "TXXXXXXXX"
+        CorpID = "XXXXXXX"
+        Secret = "XXXXXXX"
         url1 = "https://qyapi.weixin.qq.com/cgi-bin/gettoken?corpid=%s&corpsecret=%s" % (CorpID, Secret)
         r = requests.get(url1)
         # 获取access_token
@@ -123,7 +123,7 @@ class check_eos(object):
                 self.set_file('write', info=n, filepath=filepath2)
             return False
         else:
-            if n > 2:
+            if n > 3:
                 print "%s | 故障恢复" % nowtime
                 messages = "%s 故障恢复\n恢复时间: %s" % (nodename, nowtime)
                 self.alarm(messages, title='EOS故障恢复')
@@ -132,21 +132,25 @@ class check_eos(object):
             self.set_file('write', info="0", filepath=filepath2)
             return True
 
-    def diff_hbp(self, hbp, laste_numb):
+    def diff_hbp(self, hbp, m):
         if hbp == nodename:
-            if laste_numb > 21:
-                messages = "恢复信息: 恢复出块，轮次第%s次\n报警时间: %s" % (laste_numb, nowtime)
+            if m > 21:
+                messages = "恢复信息: 恢复出块，轮次第%s次\n报警时间: %s" % (m, nowtime)
                 self.alarm(messages, title='EOS故障恢复')
-            self.set_file('write', info="0", filepath=filepath3)
+            self.set_file('write', info="1", filepath=filepath3)
+            return 1
 
         else:
-            laste_numb = int(laste_numb + 1)
-            if laste_numb > 21:
-                messages = "故障信息: 出现一轮未出块，轮次第%s次\n报警时间: %s" % (laste_numb, nowtime)
-                print "%s | 出现一轮未出块，轮次第%s次" % (nowtime, laste_numb)
+            m = int(m + 1)
+            if m > 21:
+
+                messages = "故障信息: 出现一轮未出块，轮次第%s次\n报警时间: %s" % (m, nowtime)
+                print "%s | 出现一轮未出块，轮次第%s次" % (nowtime, m)
                 self.alarm(messages)
-            self.set_file('write', info=str(laste_numb), filepath=filepath3)
-        return laste_numb
+                self.set_file('write', info=str(m), filepath=filepath3)
+            else:
+                self.set_file('write', info=str(m), filepath=filepath3)
+            return m
 
     def set_file(self, action, info=None, filepath=None):
         if action == 'write':
@@ -169,4 +173,4 @@ if __name__ == '__main__':
         nowtime = time.strftime(timeformat, time.localtime())
         run = check_eos()
         run.get_info()
-        time.sleep(6)
+        time.sleep(5)
