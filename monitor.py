@@ -5,32 +5,15 @@
 import requests
 import json
 import time
-import os
 
-nodename = "eosphereiobp"
+Produced = "eosphereiobp"
 address = '13.211.220.84'
 
-filepath1 = '/tmp/.status'
-filepath2 = '/tmp/.n'
-filepath3 = '/tmp/.m'
 timeformat = '%Y-%m-%d %X'
 
 print "当前监控的地址: %s" % (address)
 
-
-def init_file():
-    f1 = open(filepath1, 'w+')
-    f1.write('0000')
-    f1.close()
-    f2 = open(filepath2, 'w+')
-    f2.write('0')
-    f2.close()
-    f3 = open(filepath3, 'w+')
-    f3.write('0')
-    f3.close()
-
-
-init_file()
+id_list = {'lib': 0, 'libn': 0, 'numberDisplay': 0}
 
 
 class send_message(object):
@@ -39,18 +22,18 @@ class send_message(object):
         pass
 
     def access_server(self):
-        CorpID = "XXXXXXX"
-        Secret = "XXXXXXX"
+        CorpID = "wx737b306e7efcf40c"
+        Secret = "T3CLEw4s--q4624WxF3BT_wgdzgidZXXNcoJkpfqJi1dTlvZQWi9JtPDi1-hr3ND"
         url1 = "https://qyapi.weixin.qq.com/cgi-bin/gettoken?corpid=%s&corpsecret=%s" % (CorpID, Secret)
         r = requests.get(url1)
         # 获取access_token
         access_token = json.loads(r.text)['access_token']
         return access_token
 
-    def send_weixin(self, nodename, messages, title):
+    def send_weixin(self, Produced, messages, title):
         news = {
-            # "touser": "wo_weixinni|d41d8cd98f00b204e9800998ecf8427e|Zhangshiqi|ChengSongsong",  # 用户ID    多个ID 可以用|隔开
-            "touser": "wo_weixinni",
+            "touser": "wo_weixinni|d41d8cd98f00b204e9800998ecf8427e|Zhangshiqi|ChengSongsong",  # 用户ID    多个ID 可以用|隔开
+            # "touser": "wo_weixinni",
             "toparty": " 2 ",  # 部门ID
             "totag": "  ",
             "msgtype": "news",
@@ -58,7 +41,7 @@ class send_message(object):
             "news": {
                 "articles": [
                     {
-                        "title": "%s| %s" % (title, nodename),
+                        "title": "%s| %s" % (title, Produced),
                         "description": messages
                     },
                 ]
@@ -90,13 +73,14 @@ class check_eos(object):
             hbp = json.loads(data)["head_block_producer"]  # 这里简写为hbp
             # 判断分叉的俩个依据，主要是看lib值和hbp的值,如果lib的值出现持续不变的情况下，则有可能是分叉了；
             # 或者lib值持续变化，但hbp的字段在130秒后没有重复出现，则也有可能出现分叉，这里不用时间做计算，使用计数方式，21个节点，也就是说每22次上回重复出现，如果没有出现，则有可能出现分叉
-            lib = str(json.loads(data)["last_irreversible_block_num"])
-
-            laste_numb = int(self.set_file('read', filepath=filepath3))
+            lib = json.loads(data)["last_irreversible_block_num"]
             if self.diff_lib(lib):
-                laste_numb = int(self.set_file('read', filepath=filepath3))
-                laste_numb = self.diff_hbp(hbp, laste_numb)
-            print u"%s | hbp: %s, lib: %s, head_block_num: %s, No.%s" % (nowtime, hbp, lib, head_block_num, laste_numb)
+                numberDisplay = self.diff_hbp(hbp)
+            else:
+                numberDisplay = id_list['numberDisplay']
+            print "%s | hbp: %s, lib: %s, head_block_num: %s, No.%s" % (
+                nowtime, hbp, lib, head_block_num, numberDisplay)
+            print id_list
 
         except Exception, e:
             messages = "故障信息: EOS服务故障,接口异常\n故障时间: %s" % nowtime
@@ -105,67 +89,57 @@ class check_eos(object):
             print "%s | %s" % (nowtime, info)
 
     def diff_lib(self, lib):
-        laste_numb = self.set_file('read', filepath=filepath1)
-        n = int(self.set_file('read', filepath=filepath2))
+        laste_numb = id_list['lib']
+        libn = id_list['libn']
         if laste_numb == lib:
 
-            if n > 2:
-                messages = "故障信息: 可能出现分叉,请注意!\n报警次数: 第%s次(若频繁报警，请尽快处理)\n故障时间: %s" % (n - 2, nowtime)
+            if libn > 2:
+                messages = "故障信息: 可能出现分叉,请注意!\n报警次数: 第%s次(若频繁报警，请尽快处理)\n故障时间: %s" % (libn - 2, nowtime)
                 info = '出现分叉'
                 self.alarm(messages)
-                n = str(n + 1)
-                self.set_file('write', info=n, filepath=filepath2)
+                libn = libn + 1
                 print "%s | %s" % (nowtime, info)
 
             else:
-                n = str(n + 1)
-                print "%s | 可能出现分叉，第%s次预警" % (nowtime, n)
-                self.set_file('write', info=n, filepath=filepath2)
+                libn = str(libn + 1)
+                print "%s | 可能出现分叉，第%s次预警" % (nowtime, libn)
+            id_list['libn'] = libn
             return False
         else:
-            if n > 3:
+            if libn > 3:
                 print "%s | 故障恢复" % nowtime
-                messages = "%s 故障恢复\n恢复时间: %s" % (nodename, nowtime)
+                messages = "%s 故障恢复\n恢复时间: %s" % (Produced, nowtime)
                 self.alarm(messages, title='EOS故障恢复')
 
-            self.set_file('write', info=lib, filepath=filepath1)
-            self.set_file('write', info="0", filepath=filepath2)
+            id_list['lib'] = lib
+            id_list['libn'] = libn
             return True
 
-    def diff_hbp(self, hbp, m):
-        if hbp == nodename:
-            if m > 21:
-                messages = "恢复信息: 恢复出块，轮次第%s次\n报警时间: %s" % (m, nowtime)
+    def diff_hbp(self, hbp):
+        numberDisplay = id_list['numberDisplay']
+        if hbp == Produced:
+            if numberDisplay > 21:
+                messages = "恢复信息: 恢复出块，轮次第%s次\n报警时间: %s" % (numberDisplay, nowtime)
                 self.alarm(messages, title='EOS故障恢复')
-            self.set_file('write', info="1", filepath=filepath3)
+            id_list['numberDisplay'] = 0
             return 1
 
         else:
-            m = int(m + 1)
-            if m > 21:
-                numb = m / 21
-                messages = "故障信息: 出现%s轮未出块，轮次第%s次\n报警时间: %s" % (numb, m, nowtime)
-                print "%s | 出现%s轮未出块，轮次第%s次" % (nowtime, numb, m)
+            numberDisplay = int(numberDisplay + 1)
+            if numberDisplay > 21:
+                numb = numberDisplay / 21
+                messages = "故障信息: 出现%s轮未出块，轮次第%s次\n报警时间: %s" % (numb, numberDisplay, nowtime)
+                print "%s | 出现%s轮未出块，轮次第%s次" % (nowtime, numb, numberDisplay)
+                print "请尽快切换备节点"
                 self.alarm(messages)
-                self.set_file('write', info=str(m), filepath=filepath3)
+                id_list['numberDisplay'] = numberDisplay
             else:
-                self.set_file('write', info=str(m), filepath=filepath3)
-            return m
-
-    def set_file(self, action, info=None, filepath=None):
-        if action == 'write':
-            f = open(filepath, 'w+')
-            f.write(info)
-            f.close()
-        elif action == 'read':
-            f = open(filepath, 'r')
-            fp = f.readline()
-            f.close()
-            return fp
+                id_list['numberDisplay'] = numberDisplay
+            return numberDisplay
 
     def alarm(self, messages, title='EOS故障报警'):
         send = send_message()
-        send.send_weixin(nodename, messages, title)
+        send.send_weixin(Produced, messages, title)
 
 
 if __name__ == '__main__':
