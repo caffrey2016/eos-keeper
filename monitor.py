@@ -7,8 +7,8 @@ import json
 import time
 import os
 
-nodename = "eosstore1111"
-address = '127.0.0.1'
+nodename = "eosphereiobp"
+address = '13.211.220.84'
 
 filepath1 = '/tmp/.status'
 filepath2 = '/tmp/.n'
@@ -143,9 +143,9 @@ class check_eos(object):
         else:
             m = int(m + 1)
             if m > 21:
-
-                messages = "故障信息: 出现一轮未出块，轮次第%s次\n报警时间: %s" % (m, nowtime)
-                print "%s | 出现一轮未出块，轮次第%s次" % (nowtime, m)
+                numb = m / 21
+                messages = "故障信息: 出现%s轮未出块，轮次第%s次\n报警时间: %s" % (numb, m, nowtime)
+                print "%s | 出现%s轮未出块，轮次第%s次" % (nowtime, numb, m)
                 self.alarm(messages)
                 self.set_file('write', info=str(m), filepath=filepath3)
             else:
