@@ -121,7 +121,7 @@ class check_eos(object):
             if numberDisplay > 21:
                 messages = "恢复信息: 恢复出块，轮次第%s次\n报警时间: %s" % (numberDisplay, nowtime)
                 self.alarm(messages, title='EOS故障恢复')
-            id_list['numberDisplay'] = 0
+            id_list['numberDisplay'] = 1
             return 1
 
         else:
