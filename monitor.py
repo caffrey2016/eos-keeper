@@ -101,7 +101,7 @@ class check_eos(object):
                 print "%s | %s" % (nowtime, info)
 
             else:
-                libn = str(libn + 1)
+                libn = libn + 1
                 print "%s | 可能出现分叉，第%s次预警" % (nowtime, libn)
             id_list['libn'] = libn
             return False
