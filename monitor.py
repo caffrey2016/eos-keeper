@@ -125,7 +125,7 @@ class check_eos(object):
             return 1
 
         else:
-            numberDisplay = int(numberDisplay + 1)
+            numberDisplay = numberDisplay + 1
             if numberDisplay > 21:
                 numb = numberDisplay / 21
                 messages = "故障信息: 出现%s轮未出块，轮次第%s次\n报警时间: %s" % (numb, numberDisplay, nowtime)
