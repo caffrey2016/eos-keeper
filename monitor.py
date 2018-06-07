@@ -112,7 +112,7 @@ class check_eos(object):
                 self.alarm(messages, title='EOS故障恢复')
 
             id_list['lib'] = lib
-            id_list['libn'] = libn
+            id_list['libn'] = 0
             return True
 
     def diff_hbp(self, hbp):
