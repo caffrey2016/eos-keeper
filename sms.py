@@ -10,8 +10,8 @@ sign = '【运维部】'
 querystring = {"action": "send",
                "userid": "52483",
                "account": "AA00869",
-               "password": "240F0F87A6A8AF3A2E8D388179D094E6",
-               "mobile": "15321985268,18610881110",
+               "password": "XXXXXXXXXXXXXXXXX",
+               "mobile": "18210506606,13521319337,18610881110,15321985269",
                "content": message + sign,
                "sendTime": "", "extno": ""}
 

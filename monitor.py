@@ -7,7 +7,7 @@ import json
 import time
 
 Produced = "eosphereiobp"
-address = '13.211.220.84'
+address = '13.211.220.86'
 
 timeformat = '%Y-%m-%d %X'
 
@@ -58,7 +58,7 @@ class send_message(object):
         else:
             print "%s | 微信报警发送失败!" % nowtime
 
-    def send_sms(self, message):
+    def send_sms(self, message, mobile):
 
         url = "https://dx.ipyy.net/smsJson.aspx"
         sign = '【运维部】'
@@ -66,8 +66,8 @@ class send_message(object):
         querystring = {"action": "send",
                        "userid": "52483",
                        "account": "AA00869",
-                       "password": "240F0F87A6A8AF3A2E8D388179D094E6",
-                       "mobile": "15321985269",
+                       "password": "XXXXXXXXXXXXXXXXXXXXX",
+                       "mobile": mobile,
                        "content": message + sign,
                        "sendTime": "", "extno": ""}
 
@@ -163,9 +163,14 @@ class check_eos(object):
             return numberDisplay
 
     def alarm(self, messages, title='EOS故障报警'):
+        # 18210506606  张诗琦
+        # 13521319337  成松
+        # 18610881110 宋亚伟
+        messages = "EOS报警测试"
+        mobile = "18210506606,13521319337,18610881110,15321985269"
         send = send_message()
         send.send_weixin(Produced, messages, title)
-        send.send_sms(messages)
+        send.send_sms(messages, mobile)
 
 
 if __name__ == '__main__':
