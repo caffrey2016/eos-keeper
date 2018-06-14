@@ -22,8 +22,8 @@ class send_message(object):
         pass
 
     def access_server(self):
-        CorpID = "wx737b306e7efcf40c"
-        Secret = "T3CLEw4s--q4624WxF3BT_wgdzgidZXXNcoJkpfqJi1dTlvZQWi9JtPDi1-hr3ND"
+        CorpID = "XXXXXXXXXXXXXXXXX"
+        Secret = "XXXXXXXXXXXXXXXXX"
         url1 = "https://qyapi.weixin.qq.com/cgi-bin/gettoken?corpid=%s&corpsecret=%s" % (CorpID, Secret)
         r = requests.get(url1)
         # 获取access_token
@@ -61,12 +61,12 @@ class send_message(object):
     def send_sms(self, message, mobile):
 
         url = "https://dx.ipyy.net/smsJson.aspx"
-        sign = '【运维部】'
+        sign = '请尽快处理，非负责人，请忽略。【CoolBit】'
 
         querystring = {"action": "send",
                        "userid": "52483",
                        "account": "AA00869",
-                       "password": "XXXXXXXXXXXXXXXXXXXXX",
+                       "password": "240F0F87A6A8AF3A2E8D388179D094E6",
                        "mobile": mobile,
                        "content": message + sign,
                        "sendTime": "", "extno": ""}

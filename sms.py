@@ -4,13 +4,13 @@ import requests
 
 url = "https://dx.ipyy.net/smsJson.aspx"
 
-message = "线上服务异常，请及时处理!@亚伟"
-sign = '【运维部】'
+message = "线上服务异常!"
+sign = '请尽快处理，非负责人，请忽略。【CoolBit】'
 
 querystring = {"action": "send",
-               "userid": "52483",
-               "account": "AA00869",
-               "password": "XXXXXXXXXXXXXXXXX",
+               "userid": "XXXXXXXXXXXXXXXXXXXXXXXXX",
+               "account": "XXXXXXXXXXXXXXXXXXXXXXXXX",
+               "password": "XXXXXXXXXXXXXXXXXXXXXXXXX",
                "mobile": "18210506606,13521319337,18610881110,15321985269",
                "content": message + sign,
                "sendTime": "", "extno": ""}
